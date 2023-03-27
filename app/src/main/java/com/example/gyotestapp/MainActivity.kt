@@ -55,7 +55,14 @@ fun SetColumns(
         }
         TextField(
             value = mutablelStateValue,
-            onValueChange = onTextInput
+            onValueChange = onTextInput,
+            label = { Text("Label") },
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Red,
+                backgroundColor = Color.Blue,
+                focusedIndicatorColor = Color.Green,
+                unfocusedIndicatorColor = Color.Yellow
+            )
         )
         Button(
             onClick = buttonClick
