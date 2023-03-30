@@ -1,5 +1,6 @@
 package com.example.gyotestapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -21,23 +25,45 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.gyotestapp.ui.theme.GyoTestAppTheme
+import com.example.gyotestapp.ui.theme.lightGreen
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent(content = {
-            MainScreen()
+            // carichiamo il template custom
+            GyoTestAppTheme() {
+                MainScreen()
+            }
+
         })
     }
 
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
     fun MainScreen() {
-        Surface(
-            color = Color.LightGray,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            ProfileCard()
+        Scaffold(topBar = { AppBar() }) {
+            Surface(
+                color = Color.LightGray,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                ProfileCard()
+            }
         }
+    }
+
+    @Composable
+    fun AppBar() {
+        TopAppBar(
+            navigationIcon = { Icon(Icons.Default.Person,
+                "Home",
+                modifier = Modifier.padding(12.dp))
+                             },
+            title = {Text("Messaging Application Users")}
+        )
+
     }
 
     @Composable
@@ -64,7 +90,9 @@ class MainActivity : ComponentActivity() {
     fun ProfilePicture() {
         Card(
             shape = CircleShape,
-            border = BorderStroke(width = 2.dp, color = Color.DarkGray),
+            border = BorderStroke(
+                width = 2.dp,
+                color = MaterialTheme.colors.lightGreen),
             modifier = Modifier.padding(16.dp),
             elevation = 4.dp
 
@@ -80,10 +108,22 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun ProfileContent() {
-        Text(
-            text = "Hisagi Hyuei",
-            color = Color.DarkGray
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Text(
+                text = "Hisagi Hyuei",
+                color = Color.DarkGray,
+                style = MaterialTheme.typography.h4
+            )
+            Text(
+                text = "Active now",
+                color = Color.DarkGray,
+                style = MaterialTheme.typography.h6
+            )
+        }
     }
 
     /*
@@ -206,6 +246,8 @@ class MainActivity : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun DefaultPreview() {
-        MainScreen()
+        GyoTestAppTheme() {
+            MainScreen()
+        }
     }
 }
