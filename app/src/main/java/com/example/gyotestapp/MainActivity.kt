@@ -14,12 +14,18 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.gyotestapp.ui.theme.GyoTestAppTheme
 import com.example.gyotestapp.ui.theme.lightGreen
 
@@ -104,11 +110,23 @@ class MainActivity : ComponentActivity() {
             elevation = 4.dp
 
         ) {
+            /* version with normal Image
             Image(
                 bitmap = ImageBitmap.imageResource( id = drawable ),
                 contentDescription = "profileImage",
                 modifier = Modifier.size(72.dp),
                 contentScale = ContentScale.Crop
+            )*/
+            // version using Coil Library
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data("https://www.google.com/imgres?imgurl=https%3A%2F%2Fwww.tiktok.com%2Fapi%2Fimg%2F%3FitemId%3D7172350438694604059%26location%3D0%26aid%3D1988&tbnid=zF4DtBSvrBZ2UM&vet=12ahUKEwjelrmYxob-AhXyhP0HHQ9pC0AQMygpegUIARCZAg..i&imgrefurl=https%3A%2F%2Fwww.tiktok.com%2Fdiscover%2FSh%25C5%25ABhei-Hisagi---Bleach&docid=GcAj6FRy0P6_pM&w=720&h=720&q=hisagi%20bleach&ved=2ahUKEwjelrmYxob-AhXyhP0HHQ9pC0AQMygpegUIARCZAg")
+                    .crossfade(true)
+                    .build(),
+                placeholder = painterResource(R.drawable.hisag),
+                contentDescription = "image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.clip(CircleShape)
             )
         }
     }
