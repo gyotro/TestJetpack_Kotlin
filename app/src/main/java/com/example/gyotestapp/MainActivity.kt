@@ -10,19 +10,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.gyotestapp.ui.theme.GyoTestAppTheme
@@ -35,7 +30,7 @@ class MainActivity : ComponentActivity() {
         setContent(content = {
             // carichiamo il template custom
             GyoTestAppTheme() {
-                MainScreen()
+                MainScreen(userProfileList)
             }
 
         })
@@ -43,13 +38,18 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
-    fun MainScreen() {
+    fun MainScreen(userProfile: List<UserProfile>) {
         Scaffold(topBar = { AppBar() }) {
             Surface(
                 color = Color.LightGray,
                 modifier = Modifier.fillMaxSize()
             ) {
-                ProfileCard()
+                Column {
+                    userProfile.forEach() {
+                        ProfileCard(it)
+                    }
+                }
+
             }
         }
     }
@@ -67,10 +67,13 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ProfileCard() {
+    fun ProfileCard(userProfile: UserProfile) {
         Card(
             modifier = Modifier
-                .padding(15.dp)
+                .padding(top = 10.dp,
+                    start = 10.dp,
+                    bottom = 10.dp ,
+                    end = 10.dp)
                 .fillMaxWidth()
                 .wrapContentHeight(align = Alignment.Top),
             elevation = 8.dp
@@ -80,25 +83,29 @@ class MainActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                ProfilePicture()
-                ProfileContent()
+                ProfilePicture(userProfile.drawable, userProfile.status)
+                ProfileContent(userProfile.name, userProfile.status)
             }
         }
     }
 
     @Composable
-    fun ProfilePicture() {
+    fun ProfilePicture(drawable: Int, status: Boolean) {
         Card(
             shape = CircleShape,
             border = BorderStroke(
                 width = 2.dp,
-                color = MaterialTheme.colors.lightGreen),
+                color = if (status)
+                    MaterialTheme.colors.lightGreen
+                else
+                    Color.Red
+        ),
             modifier = Modifier.padding(16.dp),
             elevation = 4.dp
 
         ) {
             Image(
-                bitmap = ImageBitmap.imageResource( id = R.drawable.hisag ),
+                bitmap = ImageBitmap.imageResource( id = drawable ),
                 contentDescription = "profileImage",
                 modifier = Modifier.size(72.dp),
                 contentScale = ContentScale.Crop
@@ -107,19 +114,22 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ProfileContent() {
+    fun ProfileContent(name: String, status: Boolean) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
             Text(
-                text = "Hisagi Hyuei",
+                text = name,
                 color = Color.DarkGray,
                 style = MaterialTheme.typography.h4
             )
             Text(
-                text = "Active now",
+                text = if (status)
+                    "Active now"
+                else
+                    "Offline",
                 color = Color.DarkGray,
                 style = MaterialTheme.typography.h6
             )
@@ -247,7 +257,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun DefaultPreview() {
         GyoTestAppTheme() {
-            MainScreen()
+            MainScreen(userProfileList)
         }
     }
 }
