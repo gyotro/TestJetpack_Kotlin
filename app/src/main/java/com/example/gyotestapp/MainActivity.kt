@@ -5,8 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -16,12 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -50,12 +48,15 @@ class MainActivity : ComponentActivity() {
                 color = Color.LightGray,
                 modifier = Modifier.fillMaxSize()
             ) {
-                Column {
-                    userProfile.forEach() {
-                        ProfileCard(it)
-                    }
+                LazyColumn {
+                   items(userProfile) { userProfileItem ->
+                       ProfileCard(userProfileItem)
+                   }
                 }
-
+                /* Column {
+                        userProfile.forEach() {
+                            ProfileCard(it)
+                        }*/
             }
         }
     }
@@ -89,14 +90,14 @@ class MainActivity : ComponentActivity() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                ProfilePicture(userProfile.drawable, userProfile.status)
+                ProfilePicture(userProfile.drawableUrl, userProfile.status)
                 ProfileContent(userProfile.name, userProfile.status)
             }
         }
     }
 
     @Composable
-    fun ProfilePicture(drawable: Int, status: Boolean) {
+    fun ProfilePicture(drawableUrl: String, status: Boolean) {
         Card(
             shape = CircleShape,
             border = BorderStroke(
@@ -110,9 +111,9 @@ class MainActivity : ComponentActivity() {
             elevation = 4.dp
 
         ) {
-            /* version with normal Image
-            Image(
-                bitmap = ImageBitmap.imageResource( id = drawable ),
+            // version with normal Image
+/*            Image(
+                bitmap = ImageBitmap.imageResource(drawable),
                 contentDescription = "profileImage",
                 modifier = Modifier.size(72.dp),
                 contentScale = ContentScale.Crop
@@ -120,10 +121,10 @@ class MainActivity : ComponentActivity() {
             // version using Coil Library
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data("https://www.google.com/imgres?imgurl=https%3A%2F%2Fwww.tiktok.com%2Fapi%2Fimg%2F%3FitemId%3D7172350438694604059%26location%3D0%26aid%3D1988&tbnid=zF4DtBSvrBZ2UM&vet=12ahUKEwjelrmYxob-AhXyhP0HHQ9pC0AQMygpegUIARCZAg..i&imgrefurl=https%3A%2F%2Fwww.tiktok.com%2Fdiscover%2FSh%25C5%25ABhei-Hisagi---Bleach&docid=GcAj6FRy0P6_pM&w=720&h=720&q=hisagi%20bleach&ved=2ahUKEwjelrmYxob-AhXyhP0HHQ9pC0AQMygpegUIARCZAg")
+                    .data(drawableUrl)
                     .crossfade(true)
                     .build(),
-                placeholder = painterResource(R.drawable.hisag),
+                placeholder = painterResource(R.drawable.error),
                 contentDescription = "image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.clip(CircleShape)
