@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
         setContent(content = {
             // carichiamo il template custom
             GyoTestAppTheme() {
-                MainScreen(userProfileList)
+                UserListScreen(userProfileList)
             }
 
         })
@@ -42,7 +43,7 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @Composable
-    fun MainScreen(userProfile: List<UserProfile>) {
+    fun UserListScreen(userProfile: List<UserProfile>) {
         Scaffold(topBar = { AppBar() }) {
             Surface(
                 color = Color.LightGray,
@@ -97,7 +98,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ProfilePicture(drawableUrl: String, status: Boolean) {
+    fun ProfilePicture(drawableUrl: String, status: Boolean, imageSize: Int = 90){
         Card(
             shape = CircleShape,
             border = BorderStroke(
@@ -111,14 +112,6 @@ class MainActivity : ComponentActivity() {
             elevation = 4.dp
 
         ) {
-            // version with normal Image
-/*            Image(
-                bitmap = ImageBitmap.imageResource(drawable),
-                contentDescription = "profileImage",
-                modifier = Modifier.size(72.dp),
-                contentScale = ContentScale.Crop
-            )*/
-            // version using Coil Library
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(drawableUrl)
@@ -128,21 +121,25 @@ class MainActivity : ComponentActivity() {
                 contentDescription = "image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.clip(CircleShape)
+                    .size(imageSize.dp)
             )
         }
     }
 
     @Composable
-    fun ProfileContent(name: String, status: Boolean) {
+    fun ProfileContent(name: String, status: Boolean, alignment: Alignment.Horizontal = Alignment.Start) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
+//   la commentiamo per evitare che sia mal allineato lo screen UserProfile
+//                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalAlignment = alignment
         ) {
             Text(
                 text = name,
                 color = Color.DarkGray,
-                style = MaterialTheme.typography.h4
+                style = MaterialTheme.typography.h4,
+             //   textAlign = TextAlign.Center
             )
             Text(
                 text = if (status)
@@ -150,8 +147,32 @@ class MainActivity : ComponentActivity() {
                 else
                     "Offline",
                 color = Color.DarkGray,
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h6,
+                //textAlign = TextAlign.Center
             )
+        }
+    }
+
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+    @Composable
+    fun UserDetailsScreen(userProfile: UserProfile = userProfileList[0]) {
+        Scaffold(topBar = { AppBar() }) {
+            Surface(
+                color = Color.White,
+                modifier = Modifier.fillMaxSize()
+            )
+            {
+                Column(
+                    // modifier = androidx.compose.ui.Modifier.fillMaxWidth(),
+                    //HorizontalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    //horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Start
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    ProfilePicture(userProfile.drawableUrl, userProfile.status, imageSize = 250)
+                    ProfileContent(userProfile.name, userProfile.status, Alignment.CenterHorizontally)
+                }
+            }
         }
     }
 
@@ -274,9 +295,16 @@ class MainActivity : ComponentActivity() {
     */
     @Preview(showBackground = true)
     @Composable
-    fun DefaultPreview() {
+    fun UserPreview() {
         GyoTestAppTheme() {
-            MainScreen(userProfileList)
+            UserDetailsScreen()
+        }
+    }
+    @Preview(showBackground = true)
+    @Composable
+    fun ListUserPreview() {
+        GyoTestAppTheme() {
+            UserListScreen(userProfileList)
         }
     }
 }
