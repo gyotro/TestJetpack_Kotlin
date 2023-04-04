@@ -12,12 +12,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -88,16 +90,22 @@ fun UsersApplicationNavigation(userProfile: List<UserProfile> = userProfileList)
                     type = NavType.IntType
                 } ) ),
             content = {
-                navBackStackEntry ->  UserDetailsScreen(navBackStackEntry.arguments!!.getInt("userId"))
+                navBackStackEntry ->  UserDetailsScreen(navBackStackEntry.arguments!!.getInt("userId"), navControl)
             })
     }
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun UserDetailsScreen(userProfileId: Int) {
+fun UserDetailsScreen(userProfileId: Int, navControl: NavHostController?) {
     val userProfile = userProfileList.first { it.userId == userProfileId }
-    Scaffold(topBar = { AppBar() }) {
+    Scaffold(topBar = { AppBar(
+        onClickFunc = {
+            navControl?.navigateUp()
+        },
+        title = "User Detail",
+        icon = Icons.Default.ArrowBack
+    ) }) {
         Surface(
             color = Color.White,
             modifier = Modifier.fillMaxSize()
@@ -118,13 +126,16 @@ fun UserDetailsScreen(userProfileId: Int) {
 }
 
 @Composable
-fun AppBar() {
+fun AppBar(title: String = "Messaging App", icon: ImageVector = Icons.Default.Home, onClickFunc: () -> Unit = {}) {
     TopAppBar(
         navigationIcon = {
             Icon(
-                Icons.Default.Person,
+                icon,
                 "Home",
                 modifier = Modifier.padding(12.dp)
+                    .clickable {
+                        onClickFunc.invoke()
+                    }
             )
         },
         title = { Text("Messaging Application Users") }
@@ -337,7 +348,7 @@ fun GreetingButton() {
 @Composable
 fun UserPreview() {
     GyoTestAppTheme() {
-        UserDetailsScreen(0)
+        UserDetailsScreen(0, null)
     }
 }
 
