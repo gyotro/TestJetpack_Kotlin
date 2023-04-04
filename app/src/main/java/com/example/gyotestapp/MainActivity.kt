@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.navigation.compose.DialogNavigator
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -35,6 +36,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.gyotestapp.ui.theme.GyoTestAppTheme
 import com.example.gyotestapp.ui.theme.lightGreen
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.NavGraph
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 
 
 class MainActivity : ComponentActivity() {
@@ -43,15 +50,20 @@ class MainActivity : ComponentActivity() {
         setContent(content = {
             // carichiamo il template custom
             GyoTestAppTheme() {
-                UsersApplicationNavigation()
+                DestinationsNavHost(navGraph = NavGraphs.root)
             }
         })
     }
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@RootNavGraph(start = true) // sets this as the start destination of the default nav graph
+@Destination // needed for ramcosta libraries
 @Composable
-fun UserListScreen(userProfile: List<UserProfile>, navController: NavHostController? = null) {
+fun UserListScreen(userProfile: List<UserProfile> = userProfileList,
+    navigator: DestinationsNavigator? // needed for ramcosta libraries
+                   //navController: NavHostController? = null
+    ) {
     Scaffold(topBar = { AppBar() }) {
         Surface(
             color = Color.Transparent,
@@ -61,14 +73,19 @@ fun UserListScreen(userProfile: List<UserProfile>, navController: NavHostControl
                 items(userProfile) { userProfileItem ->
                     ProfileCard(userProfileItem, onClickFunc = {
                         // inserire il nome del composable a cui navigare
-                        navController?.navigate("user_details/${userProfileItem.userId}")
+                        //navController?.navigate("user_details/${userProfileItem.userId}")
+                        navigator!!.navigate(
+                            com.example.gyotestapp.destinations.UserDetailsScreenDestination(
+                                userProfileItem
+                            )
+                        )
                     })
                 }
             }
         }
     }
 }
-
+/*
 @Composable
 fun UsersApplicationNavigation(userProfile: List<UserProfile> = userProfileList) {
     // oggetto necessario per la navigazoine
@@ -94,14 +111,18 @@ fun UsersApplicationNavigation(userProfile: List<UserProfile> = userProfileList)
             })
     }
 }
-
+*/
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun UserDetailsScreen(userProfileId: Int, navControl: NavHostController?) {
-    val userProfile = userProfileList.first { it.userId == userProfileId }
+@Destination // needed for ramcosta libraries
+fun UserDetailsScreen(userProfileItem: UserProfile,
+                      navigator: DestinationsNavigator?
+                      //navControl: NavHostController?
+     ) {
+    val userProfile = userProfileItem
     Scaffold(topBar = { AppBar(
         onClickFunc = {
-            navControl?.navigateUp()
+            navigator!!.navigateUp()
         },
         title = "User Detail",
         icon = Icons.Default.ArrowBack
@@ -348,7 +369,11 @@ fun GreetingButton() {
 @Composable
 fun UserPreview() {
     GyoTestAppTheme() {
-        UserDetailsScreen(0, null)
+        UserDetailsScreen(UserProfile(name = "Hisagi Shuhei",
+            userId = 0,
+            status = true,
+            drawableUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSn4t4DTGwP3ucBI0gLh8fien2ZIovaCoPvaVK6Dwu-3Dvj3CVN-U5XduLxR0g6wxNIuiw&usqp=CAU"),
+            null)
     }
 }
 
@@ -356,6 +381,6 @@ fun UserPreview() {
 @Composable
 fun ListUserPreview() {
     GyoTestAppTheme() {
-        UserListScreen(userProfileList)
+        UserListScreen(userProfileList, null)
     }
 }

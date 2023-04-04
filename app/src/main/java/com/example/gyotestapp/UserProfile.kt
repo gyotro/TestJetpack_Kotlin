@@ -1,9 +1,12 @@
 package com.example.gyotestapp
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+@Parcelize
 data class UserProfile (
     val userId: Int,
     val name: String,
     val status: Boolean,
-    val drawableUrl: String)
+    val drawableUrl: String) : Parcelable
 
 val userProfileList = mutableListOf<UserProfile>(
     UserProfile(name = "Hisagi Shuhei",
