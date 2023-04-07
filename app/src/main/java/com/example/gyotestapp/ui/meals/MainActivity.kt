@@ -29,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.gyotestapp.UserProfile
+import com.example.gyotestapp.model.response.MealResponse
 import com.example.gyotestapp.ui.theme.GyoTestAppTheme
 import com.example.gyotestapp.ui.theme.lightGreen
 import com.example.gyotestapp.userProfileList
@@ -61,7 +62,16 @@ fun UserListScreen(
 ) {
     // we re binding the viewModel to the Composable
     val viewModel: GyoTestAppViewModel = viewModel()
-    Text(text = viewModel.getMeals().toString())
+    val rememberState = remember { mutableStateOf(emptyList<MealResponse>() ) }
+    viewModel.getMeals {
+        response -> rememberState.value = response.categories
+    }
+    LazyColumn() {
+        items(rememberState.value) {
+                item -> Text(text = item.name)
+        }
+    }
+
 }
 
 

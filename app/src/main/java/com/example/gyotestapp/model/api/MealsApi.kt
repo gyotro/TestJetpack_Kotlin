@@ -11,7 +11,7 @@ class MealsWebService {
     private lateinit var api: MealsApi
     init {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://www.themealdb.com/api/json/v1/1")
+            .baseUrl("https://www.themealdb.com/api/json/v1/1/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -20,7 +20,7 @@ class MealsWebService {
     fun getMeals(): Call<MealsCategoriesResponse> = api.getMeals()
 
     interface MealsApi {
-        @GET("/categories.php") // indichiamo il path
+        @GET("categories.php") // indichiamo il path
         fun getMeals(): Call<MealsCategoriesResponse>
     }
 }
