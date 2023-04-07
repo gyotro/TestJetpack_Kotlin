@@ -61,7 +61,7 @@ fun UserListScreen(
 ) {
     // we re binding the viewModel to the Composable
     val viewModel: GyoTestAppViewModel = viewModel()
-    Text(text = "Starting Point")
+    Text(text = viewModel.getMeals().toString())
 }
 
 
