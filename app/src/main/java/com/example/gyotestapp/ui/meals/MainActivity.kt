@@ -65,14 +65,7 @@ fun UserListScreen(
     // we re binding the viewModel to the Composable
     val viewModel: GyoTestAppViewModel = viewModel()
     val rememberState = remember { mutableStateOf(emptyList<MealResponse>() ) }
-    val rememberScope = rememberCoroutineScope()
-
-    // con LaunchedEffect, eseguiamo il codice all'interno solo una volta durante la Composition (e non ogni volta)
-    LaunchedEffect(key1 = "GET_MEALS") {
-        rememberScope.launch(Dispatchers.IO) {
-            rememberState.value = viewModel.getMeals()
-        }
-    }
+    rememberState.value = viewModel.mealsState.value
 
     LazyColumn() {
         items(rememberState.value) {
