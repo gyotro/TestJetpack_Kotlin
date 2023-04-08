@@ -37,6 +37,8 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -52,7 +54,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @RootNavGraph(start = true) // sets this as the start destination of the default nav graph
 @Destination // needed for ramcosta libraries
 @Composable
@@ -63,9 +65,15 @@ fun UserListScreen(
     // we re binding the viewModel to the Composable
     val viewModel: GyoTestAppViewModel = viewModel()
     val rememberState = remember { mutableStateOf(emptyList<MealResponse>() ) }
-    viewModel.getMeals {
-        response -> rememberState.value = response.categories
+    val rememberScope = rememberCoroutineScope()
+
+    // con LaunchedEffect, eseguiamo il codice all'interno solo una volta durante la Composition (e non ogni volta)
+    LaunchedEffect(key1 = "GET_MEALS") {
+        rememberScope.launch(Dispatchers.IO) {
+            rememberState.value = viewModel.getMeals()
+        }
     }
+
     LazyColumn() {
         items(rememberState.value) {
                 item -> Text(text = item.name)

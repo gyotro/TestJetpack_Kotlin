@@ -17,10 +17,10 @@ class MealsWebService {
 
         api = retrofit.create(MealsApi::class.java)
     }
-    fun getMeals(): Call<MealsCategoriesResponse> = api.getMeals()
+    suspend fun getMeals(): MealsCategoriesResponse = api.getMeals()
 
     interface MealsApi {
         @GET("categories.php") // indichiamo il path
-        fun getMeals(): Call<MealsCategoriesResponse>
+        suspend fun getMeals(): MealsCategoriesResponse
     }
 }

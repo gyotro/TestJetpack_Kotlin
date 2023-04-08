@@ -6,6 +6,6 @@ import com.example.gyotestapp.model.response.MealResponse
 import com.example.gyotestapp.model.response.MealsCategoriesResponse
 
 class GyoTestAppViewModel(private val mealsRepo: MealsRepo = MealsRepo()): ViewModel() {
-    fun getMeals(callback: (responseCallback: MealsCategoriesResponse) -> Unit) = mealsRepo.getMeals(callback)
+    suspend fun getMeals(): List<MealResponse> = mealsRepo.getMeals().categories
 
 }
