@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.gyotestapp.ui.meals.MealsListScreen
+import com.example.gyotestapp.ui.meals.NavGraphs
 import com.example.gyotestapp.ui.theme.GyoTestAppTheme
+import com.ramcosta.composedestinations.DestinationsNavHost
 
 
 class MainActivity : ComponentActivity() {
@@ -13,8 +15,8 @@ class MainActivity : ComponentActivity() {
         setContent(content = {
             // carichiamo il template custom
             GyoTestAppTheme() {
-                //DestinationsNavHost(navGraph = NavGraphs.root)
-                MealsListScreen()
+                DestinationsNavHost(navGraph = NavGraphs.root)
+                //MealsListScreen()
             }
         })
     }
