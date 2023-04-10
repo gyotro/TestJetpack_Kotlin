@@ -63,7 +63,7 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
     implementation 'androidx.activity:activity-compose:1.7.0'
@@ -75,6 +75,7 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     implementation "androidx.navigation:navigation-compose:$nav_version"
+    implementation "com.google.accompanist:accompanist-navigation-animation:0.31.0-alpha"
     //implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.1")
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -82,7 +83,11 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_ui_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
-    implementation 'io.github.raamcosta.compose-destinations:core:1.8.38-beta'
+    // Advanced with animations
+    implementation 'io.github.raamcosta.compose-destinations:animations-core:1.8.38-beta'
+    // implementation "androidx.navigation:navigation-*:2.5.3"
+    // Basic
+    //implementation 'io.github.raamcosta.compose-destinations:core:1.8.38-beta'
     ksp 'io.github.raamcosta.compose-destinations:ksp:1.8.38-beta'
 
     //Retrofit
