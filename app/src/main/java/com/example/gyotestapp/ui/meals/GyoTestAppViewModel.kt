@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class GyoTestAppViewModel(private val mealsRepo: MealsRepo = MealsRepo()): ViewModel() {
+class GyoTestAppViewModel(private val mealsRepo: MealsRepo): ViewModel() {
 
     /*
      ci sono due modi per lanciare coroutine da una viewModel:

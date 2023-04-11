@@ -50,6 +50,8 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.spec.DestinationStyle
+import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalAnimationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
@@ -59,9 +61,12 @@ import com.ramcosta.composedestinations.spec.DestinationStyle
 fun MealsListScreen(
     navigator: DestinationsNavigator?, // needed for ramcosta libraries
     //navController: NavHostController? = null
+    viewModel: GyoTestAppViewModel = koinViewModel()
 ) {
     // we re binding the viewModel to the Composable
-    val viewModel: GyoTestAppViewModel = viewModel()
+    //val viewModel: GyoTestAppViewModel = viewModel()
+    //val viewModel: GyoTestAppViewModel = koinViewModel()
+    //val viewModel = getViewModel<GyoTestAppViewModel>()
     val rememberState = remember { mutableStateOf(emptyList<MealResponse>() ) }
 
     val navHostEngine = rememberAnimatedNavHostEngine(
@@ -197,6 +202,7 @@ fun VisualizeMeal(meal: MealResponse, navigator: DestinationsNavigator?) {
             Icon(
                 imageVector = if(!isExpanded.value) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
                 contentDescription = "Expand",
+                tint = Color.Black,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(15.dp)

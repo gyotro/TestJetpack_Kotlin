@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 
 
-class MealsWebService {
+class MealsWebService: MealsApi {
     private lateinit var api: MealsApi
     init {
         val retrofit = Retrofit.Builder()
@@ -17,10 +17,10 @@ class MealsWebService {
 
         api = retrofit.create(MealsApi::class.java)
     }
-    suspend fun getMeals(): MealsCategoriesResponse = api.getMeals()
+    override suspend fun getMeals(): MealsCategoriesResponse = api.getMeals()
 
-    interface MealsApi {
-        @GET("categories.php") // indichiamo il path
-        suspend fun getMeals(): MealsCategoriesResponse
-    }
+}
+interface MealsApi {
+    @GET("categories.php") // indichiamo il path
+    suspend fun getMeals(): MealsCategoriesResponse
 }

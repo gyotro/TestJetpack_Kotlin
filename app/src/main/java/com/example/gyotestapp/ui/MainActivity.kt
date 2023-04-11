@@ -1,6 +1,7 @@
 package com.example.gyotestapp.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.gyotestapp.ui.meals.MealsListScreen
@@ -15,6 +16,7 @@ class MainActivity : ComponentActivity() {
         setContent(content = {
             // carichiamo il template custom
             GyoTestAppTheme() {
+                Log.d("Starting App", "Before Destination Nav Host")
                 DestinationsNavHost(navGraph = NavGraphs.root)
                 //MealsListScreen()
             }
