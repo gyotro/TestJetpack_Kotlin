@@ -2,6 +2,7 @@ package com.example.gyotestapp.ui.meals
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,10 +17,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,14 +59,15 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MealsListScreen(
     navigator: DestinationsNavigator?, // needed for ramcosta libraries
-    //navController: NavHostController? = null
-    viewModel: GyoTestAppViewModel = koinViewModel()
+    // navController: NavHostController? = null
+    // using DI injection with KOIN
+    viewModel: GyoTestAppViewModel = koinViewModel(),
 ) {
     // we re binding the viewModel to the Composable
     //val viewModel: GyoTestAppViewModel = viewModel()
     //val viewModel: GyoTestAppViewModel = koinViewModel()
     //val viewModel = getViewModel<GyoTestAppViewModel>()
-    val rememberState = remember { mutableStateOf(emptyList<MealResponse>() ) }
+    val rememberState = remember { mutableStateOf(emptyList<MealResponse>()) }
 
     val navHostEngine = rememberAnimatedNavHostEngine(
         navHostContentAlignment = Alignment.TopCenter,
@@ -84,9 +84,8 @@ fun MealsListScreen(
     rememberState.value = viewModel.mealsState.value
 
     LazyColumn() {
-        items(rememberState.value) {
-                item ->
-                    VisualizeMeal(item, navigator)
+        items(rememberState.value) { item ->
+            VisualizeMeal(item, navigator)
         }
     }
 
@@ -95,6 +94,10 @@ fun MealsListScreen(
 @Composable
 @Destination()
 fun MealDetail(item: MealResponse?, navigator: DestinationsNavigator) {
+    var isExpanded by remember { mutableStateOf(false) }
+    val imagegeSizeDp: Dp by animateDpAsState(
+        targetValue = if (isExpanded) 200.dp else 90.dp
+    )
     Column {
         Card(
             shape = RoundedCornerShape(12.dp),
@@ -117,7 +120,7 @@ fun MealDetail(item: MealResponse?, navigator: DestinationsNavigator) {
                     contentDescription = item.description,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(88.dp)
+                        .size(imagegeSizeDp)
                         .padding(4.dp)
                         .clip(CircleShape)
                 )
@@ -127,19 +130,38 @@ fun MealDetail(item: MealResponse?, navigator: DestinationsNavigator) {
                     )
                         .padding(10.dp)
                 ) {
-                    Text(text = item.name,
+                    Text(
+                        text = item.name,
                         color = Color.Black,
                         fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Bold)
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
-        Text(text = item!!.description,
+        Text(
+            text = item!!.description,
             color = Color.Black,
+            textAlign = TextAlign.Justify,
             fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold)
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(15.dp)
+        )
+        Button(
+            onClick = { isExpanded = isExpanded.not() },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("Change state of meal profile picture")
+        }
+        Button(
+            onClick = { navigator.navigateUp() },
+            shape = CircleShape,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text("Back")
+        }
     }
-    }
+}
 
 
 @Composable
@@ -179,34 +201,36 @@ fun VisualizeMeal(meal: MealResponse, navigator: DestinationsNavigator?) {
                 modifier = Modifier
                     .fillMaxWidth(0.8F)
                     .align(
-                    alignment = androidx.compose.ui.Alignment.CenterVertically
-                )
+                        alignment = androidx.compose.ui.Alignment.CenterVertically
+                    )
                     .padding(10.dp)
             ) {
-                Text(text = meal.name,
+                Text(
+                    text = meal.name,
                     color = Color.Black,
                     fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold)
+                    fontWeight = FontWeight.Bold
+                )
                 // the same as (LocalContentAlpha.provides(ContentAlpha.medium)
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium ){
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
                         text = meal.description,
                         color = Color.Black,
                         textAlign = TextAlign.Justify,
                         style = MaterialTheme.typography.subtitle2,
                         overflow = TextOverflow.Ellipsis,
-                        maxLines = if(isExpanded.value) 10 else 3
+                        maxLines = if (isExpanded.value) 10 else 3
                     )
                 }
             }
             Icon(
-                imageVector = if(!isExpanded.value) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+                imageVector = if (!isExpanded.value) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
                 contentDescription = "Expand",
                 tint = Color.Black,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
                     .padding(15.dp)
-                    .clickable(){isExpanded.value = !isExpanded.value }
+                    .clickable() { isExpanded.value = !isExpanded.value }
             )
         }
     }
