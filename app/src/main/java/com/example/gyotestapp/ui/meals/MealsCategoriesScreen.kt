@@ -2,15 +2,20 @@ package com.example.gyotestapp.ui.meals
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 //import androidx.compose.foundation.layout.ColumnScopeInstance.align
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -32,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -51,6 +57,7 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.ramcosta.composedestinations.spec.DestinationStyle
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterialNavigationApi::class, ExperimentalAnimationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
@@ -94,73 +101,111 @@ fun MealsListScreen(
 @Composable
 @Destination()
 fun MealDetail(item: MealResponse?, navigator: DestinationsNavigator) {
-    var isExpanded by remember { mutableStateOf(false) }
-    val imagegeSizeDp: Dp by animateDpAsState(
-        targetValue = if (isExpanded) 200.dp else 90.dp
+    // caso in cui si usa solo un valore booleano per il cambio di stato
+    /*    var isExpanded by remember { mutableStateOf(false) }
+        val imagegeSizeDp: Dp by animateDpAsState(
+            targetValue = if (isExpanded) 200.dp else 90.dp
+        )*/
+    // caso in cui si usa l'enumerable
+    // avremmo anche potuto creare la variabile così: var isExpanded = remember { mutableStateOf( ProfileStatus.Normal ) }
+    // in questo caso poi va fatto isExpanded.value
+    var isExpanded by remember { mutableStateOf(ProfileStatus.Normal) }
+    val transition = updateTransition(targetState = isExpanded, label = "")
+    val imageSizeDp: Dp by transition.animateDp(
+        targetValueByState = { it.size }, label = ""
     )
-    Column {
-        Card(
-            shape = RoundedCornerShape(12.dp),
-            elevation = 2.dp,
-            modifier = Modifier
-                .fillMaxWidth()
+    val imageColor: Color by transition.animateColor(
+        targetValueByState = { it.color }, label = ""
+    )
+    val imageBorderWidthDp: Dp by transition.animateDp(
+        targetValueByState = { it.borderWidth }, label = ""
+    )
+    // implementiamo lo scroll
+    val scrollState: LazyListState = rememberLazyListState()
+    // capire bene come si costruisce l'offset
+    val offset = min(1f,  1f - (scrollState.firstVisibleItemScrollOffset / 600f + scrollState.firstVisibleItemIndex))
+    Surface(color = MaterialTheme.colors.background) {
+        Column {
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(
+                    width = ProfileStatus.Normal.borderWidth,
+                    color = ProfileStatus.Normal.color
+                ),
+                elevation = 2.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
 //            .padding(start = 15.dp)
 
-        ) {
-            Row(
-                modifier = Modifier.padding(10.dp)
             ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(item!!.imageUrl)
-                        .crossfade(true)
-                        .build(),
-                    placeholder = painterResource(R.drawable.error),
-                    //imageLoader = rememberAsyncImagePainter(meal.imageUrl),
-                    contentDescription = item.description,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(imagegeSizeDp)
-                        .padding(4.dp)
-                        .clip(CircleShape)
-                )
-                Column(
-                    modifier = Modifier.align(
-                        alignment = androidx.compose.ui.Alignment.CenterVertically
-                    )
-                        .padding(10.dp)
+                Row(
+                    modifier = Modifier.padding(10.dp)
                 ) {
-                    Text(
-                        text = item.name,
-                        color = Color.Black,
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Bold
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(item!!.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                        placeholder = painterResource(R.drawable.error),
+                        //imageLoader = rememberAsyncImagePainter(meal.imageUrl),
+                        contentDescription = item.description,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(max(100.dp, 200.dp*offset))
+                            .padding(4.dp)
+                            .clip(CircleShape)
                     )
+                    Column(
+                        modifier = Modifier.align(
+                            alignment = androidx.compose.ui.Alignment.CenterVertically
+                        )
+                            .padding(10.dp)
+                    ) {
+                        Text(
+                            text = item.name,
+                            color = Color.Black,
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+            Text(
+                text = item!!.description,
+                color = Color.Black,
+                textAlign = TextAlign.Justify,
+                fontStyle = FontStyle.Italic,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(15.dp)
+            )
+            /*Button(
+                onClick = {
+                    isExpanded =
+                        if (isExpanded == ProfileStatus.Extended) ProfileStatus.Normal else ProfileStatus.Extended
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text("Change state of meal profile picture")
+            }*/
+            Button(
+                onClick = { navigator.navigateUp() },
+                shape = CircleShape,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text("Back")
+            }
+            val lazyList = (1..100).map { "Item_${it.toString()}" }
+            // testiamo il rimpicciolimento dell'immagine in base allo scrolling
+            LazyColumn(state = scrollState) {
+                items(lazyList) {
+                    Text(text = it, modifier = Modifier
+                        .padding(30.dp)
+                        .align(Alignment.Start))
                 }
             }
         }
-        Text(
-            text = item!!.description,
-            color = Color.Black,
-            textAlign = TextAlign.Justify,
-            fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(15.dp)
-        )
-        Button(
-            onClick = { isExpanded = isExpanded.not() },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text("Change state of meal profile picture")
-        }
-        Button(
-            onClick = { navigator.navigateUp() },
-            shape = CircleShape,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text("Back")
-        }
     }
+
 }
 
 
@@ -250,4 +295,13 @@ object NonDismissableDialog : DestinationStyle.Dialog {
         dismissOnClickOutside = true,
         dismissOnBackPress = true,
     )
+}
+
+enum class ProfileStatus(
+    val color: Color,
+    val size: Dp,
+    val borderWidth: Dp,
+) {
+    Normal(Color.LightGray, 90.dp, 5.dp),
+    Extended(Color.Blue, 200.dp, 12.dp)
 }
